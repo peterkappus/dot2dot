@@ -1,51 +1,68 @@
 
 var counter = 1;
-var pointsClicked = [];
+var points = [];
 var makingPoints = true;
 
 function setup() {
-  //createCanvas(window.innerWidth,window.innerHeight);
-  createCanvas(1295,1295);
+  createCanvas(window.innerWidth,window.innerHeight);
+  //createCanvas(1295,1295);
   fill(0);
   textSize(32);
+  
+  button = createButton('Stop Making Dots');
+  button.size(window.innerWidth/2,window.innerHeight/10);
+  button.style("background: #fc0")
+  button.position(19, 19);
+  button.touchStarted(switchMode);
 }
 
-function mouseClicked() {
+function switchMode() {
+  button.remove();
+  makingPoints = false;
+  //beginShape();
+  //reset counter, but start at second point
+  counter = 1;
+  
+  stroke(0);
+  strokeWeight(3);
+  
+}
+
+function touchStarted() {
+  //alert(mouseX);
+  touchHandler();
+  return(false);
+}
+
+function touchEnded() {
+  return(false);
+}
+
+function touchHandler() {  
   x = mouseX;
   y = mouseY;
   
-  if(makingPoints) {
-    if(counter > 1){
-      xDistanceFromStart = (x-pointsClicked[0]['x']);
-      yDistanceFromStart = (y-pointsClicked[0]['y']);
-      
-      if(Math.sqrt(Math.pow(xDistanceFromStart,2) + Math.pow(yDistanceFromStart,2)) < 20) {
-        //switch to drawing mode!
-        makingPoints = false;
-        //beginShape();
-        stroke(0);
-        strokeWeight(3);
-        //reset counter, but start at second point
-        counter = 1;
-      }else{
-        makePoint(x,y);
-      }
-    }else {
-      makePoint(x,y);
-    }
+  //console.log(counter);
+  
+  if(makingPoints) {    
+    makePoint(x,y);
   }else{
-    //connecting dots
-    //if click happens close to the next dot, then make a connection
-    currentPoint = pointsClicked[counter];
-    previousPoint = pointsClicked[counter-1]
-    console.log(currentPoint['x']);
-    console.log(distance(mouseX,mouseY,currentPoint['x'],currentPoint['y']));
-    if(distance(mouseX,mouseY,currentPoint['x'],currentPoint['y']) < 50) {
-      
-      //vertex(nextPoint['x'],nextPoint['y']);
-      line(previousPoint['x'],previousPoint['y'],currentPoint['x'],currentPoint['y']);
-      counter = (pointsClicked.length + (counter + 1)) % pointsClicked.length
-    }
+    connectDots();
+  }
+}
+
+function connectDots() {
+  //connecting dots
+  //if click happens close to the next dot, then make a connection
+  currentPoint = points[counter];
+  previousPoint = points[counter-1]
+  console.log(currentPoint['x']);
+  console.log(distance(mouseX,mouseY,currentPoint['x'],currentPoint['y']));
+  if(distance(mouseX,mouseY,currentPoint['x'],currentPoint['y']) < 50) {
+    
+    //vertex(nextPoint['x'],nextPoint['y']);
+    line(previousPoint['x'],previousPoint['y'],currentPoint['x'],currentPoint['y']);
+    counter = (points.length + (counter + 1)) % points.length
   }
 }
 
@@ -53,7 +70,7 @@ function makePoint(x,y){
   size = 8;
   triangle(x-size, y+size, x,y-size, x+size,y+size);
   text(counter,x+2,y-2)      
-  pointsClicked.push({x:x,y:y});
+  points.push({x:x,y:y});
   counter++;  
 }
 
